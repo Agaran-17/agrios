@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 from app.routers import farmers
 
-app = FastAPI(title="AgriOS API")
+app = FastAPI(title=settings.PROJECT_NAME)
 
-app.include_router(farmers.router)
+# Allow the frontend (React) to call this API from the browser
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(farmers.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/health")
